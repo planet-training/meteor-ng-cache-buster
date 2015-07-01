@@ -1,0 +1,63 @@
+__meteor_runtime_config__.ngPublicFilesHashes = {};
+
+var crypto = Npm.require('crypto');
+var fs = Npm.require('fs');
+
+
+var path = Npm.require('path');
+var recursive = Npm.require('recursive-readdir');
+
+var publicFolderLocation = '../web.browser/app';
+var absolutePublicFolderLocation = path.resolve(publicFolderLocation);
+
+
+NgCacheBusterManager = {
+    manage: manage,
+    manageAll: manageAll
+};
+
+function manageAll(dir) {
+    ensurePathStart(dir);
+
+    var fullDir = publicFolderLocation + dir;
+    fullDir = path.resolve(fullDir);
+    recursive(fullDir, function (err, files) {
+
+        if (err) {
+            console.warn('CacheBusterManager could not process dir: %s', dir, err);
+        } else {
+            files.forEach(function(file){
+
+                var fileName = file.substring(absolutePublicFolderLocation.length);
+                if(fileName.indexOf('/')!==0){
+                    fileName = '/'+fileName;
+                }
+                manage(fileName);
+            });
+        }
+    });
+}
+function manage(filename) {
+    ensurePathStart(filename);
+    var md5 = crypto.createHash('md5');
+    var s = fs.ReadStream(publicFolderLocation + filename);
+
+    s.on('data', function (d) {
+        md5.update(d);
+    });
+
+    s.on('end', function () {
+        var d = md5.digest('hex');
+
+        setEntry(filename, d);
+        console.log(d + '  ' + filename);
+    });
+}
+function ensurePathStart(name) {
+    if (name.indexOf('/') !== 0) {
+        throw new Error('Managed file paths must start with /', name);
+    }
+}
+function setEntry(serverRelativeUrl, hash) {
+    __meteor_runtime_config__.ngPublicFilesHashes[serverRelativeUrl] = hash;
+}
