@@ -48,9 +48,8 @@ function manage(filename) {
 
     s.on('end', function () {
         var d = md5.digest('hex');
-
+        console.log('CacheBuster managing: %s, hash: %s',filename,d);
         setEntry(filename, d);
-        console.log(d + '  ' + filename);
     });
 }
 function ensurePathStart(name) {
