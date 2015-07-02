@@ -13,7 +13,8 @@ var absolutePublicFolderLocation = path.resolve(publicFolderLocation);
 
 NgCacheBusterManager = {
     manage: manage,
-    manageAll: manageAll
+    manageAll: manageAll,
+    setEntry : setEntry
 };
 
 function manageAll(dir) {
