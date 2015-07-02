@@ -10,7 +10,7 @@ function ngMeteorCacheBusterInterceptor($log) {
         'request': function (config) {
 
             var cache = config.cache;
-            if (cache && cache.get(config.url) === undefined) {
+            if (!cache || cache.get(config.url) === undefined) {
 
                 var hash = hashes[config.url];
                 if (hash) {
