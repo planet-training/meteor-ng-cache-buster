@@ -1,7 +1,7 @@
-angular.module('ngMeteorCacheBuster', []).config(function ($httpProvider) {
+angular.module('ngMeteorCacheBuster', []).config(['$httpProvider', function ($httpProvider) {
 
     $httpProvider.interceptors.push(ngMeteorCacheBusterInterceptor);
-});
+}]);
 
 function ngMeteorCacheBusterInterceptor($log) {
 
@@ -24,3 +24,4 @@ function ngMeteorCacheBusterInterceptor($log) {
         }
     };
 }
+ngMeteorCacheBusterInterceptor.$inject = ['$log'];
