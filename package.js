@@ -10,7 +10,7 @@ Package.describe({
 Package.onUse(function (api) {
 
   api.use('angular:angular@1.4.1', 'client');
-  api.use('webapp', ['server'])
+  api.use('webapp@1.2.0', ['server']);
   api.use('meteorhacks:inject-initial@1.0.2');
   api.addFiles('cacheBusterInterceptor.ng.js', ['client']);
   api.addFiles('cacheBusterManager.js', ['server']);
