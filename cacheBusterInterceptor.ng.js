@@ -5,7 +5,7 @@ angular.module('ngMeteorCacheBuster', []).config(['$httpProvider', function ($ht
 
 function ngMeteorCacheBusterInterceptor($log) {
 
-    var hashes = __meteor_runtime_config__.ngPublicFilesHashes || {};
+    var hashes = Injected.obj('ngCacheKeys') || {};
     return {
         'request': function (config) {
 

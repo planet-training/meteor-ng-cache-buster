@@ -1,5 +1,3 @@
-__meteor_runtime_config__.ngPublicFilesHashes = {};
-
 var crypto = Npm.require('crypto');
 var fs = Npm.require('fs');
 
@@ -11,10 +9,13 @@ var publicFolderLocation = '../web.browser/app';
 var absolutePublicFolderLocation = path.resolve(publicFolderLocation);
 
 
+var entries = {};
+
 NgCacheBusterManager = {
     manage: manage,
     manageAll: manageAll,
-    setEntry : setEntry
+    setEntry: setEntry,
+
 };
 
 function manageAll(dir) {
@@ -27,11 +28,11 @@ function manageAll(dir) {
         if (err) {
             console.warn('CacheBusterManager could not process dir: %s', dir, err);
         } else {
-            files.forEach(function(file){
+            files.forEach(function (file) {
 
                 var fileName = file.substring(absolutePublicFolderLocation.length);
-                if(fileName.indexOf('/')!==0){
-                    fileName = '/'+fileName;
+                if (fileName.indexOf('/') !== 0) {
+                    fileName = '/' + fileName;
                 }
                 manage(fileName);
             });
@@ -49,7 +50,7 @@ function manage(filename) {
 
     s.on('end', function () {
         var d = md5.digest('hex');
-        console.log('CacheBuster managing: %s, hash: %s',filename,d);
+        console.log('CacheBuster managing: %s, hash: %s', filename, d);
         setEntry(filename, d);
     });
 }
@@ -59,5 +60,11 @@ function ensurePathStart(name) {
     }
 }
 function setEntry(serverRelativeUrl, hash) {
-    __meteor_runtime_config__.ngPublicFilesHashes[serverRelativeUrl] = hash;
+    entries[serverRelativeUrl] = hash;
 }
+WebApp.connectHandlers.use(function(req, res, next) {
+    if(Inject.appUrl(req.url)) {
+        Inject.obj('ngCacheKeys', entries);
+    }
+    next();
+});
