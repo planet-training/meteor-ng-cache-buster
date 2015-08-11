@@ -5,7 +5,7 @@ var fs = Npm.require('fs');
 var path = Npm.require('path');
 var recursive = Npm.require('recursive-readdir');
 
-var publicFolderLocation = '../web.browser/app';
+var publicFolderLocation = '../web.browser';
 var absolutePublicFolderLocation = path.resolve(publicFolderLocation);
 
 
