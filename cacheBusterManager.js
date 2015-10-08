@@ -5,7 +5,7 @@ var fs = Npm.require('fs');
 var path = Npm.require('path');
 var recursive = Npm.require('recursive-readdir');
 
-var publicFolderLocation = '../web.browser';
+var publicFolderLocation = '../web.browser/app';
 var absolutePublicFolderLocation = path.resolve(publicFolderLocation);
 
 
@@ -41,18 +41,27 @@ function manageAll(dir) {
 }
 function manage(filename) {
     ensurePathStart(filename);
-    var md5 = crypto.createHash('md5');
-    var s = fs.ReadStream(publicFolderLocation + filename);
 
-    s.on('data', function (d) {
-        md5.update(d);
-    });
+    try {
 
-    s.on('end', function () {
-        var d = md5.digest('hex');
-        console.log('CacheBuster managing: %s, hash: %s', filename, d);
-        setEntry(filename, d);
-    });
+        var s = fs.ReadStream(publicFolderLocation + filename);
+
+        var md5 = crypto.createHash('md5');
+        s.on('data', function (d) {
+            md5.update(d);
+        });
+
+        s.on('end', function () {
+            var d = md5.digest('hex');
+            console.log('CacheBuster managing: %s, hash: %s', filename, d);
+            setEntry(filename, d);
+        });
+        s.on('error', function(err){
+            console.error('error while processing %s', filename, err);
+        });
+    } catch (e) {
+        console.error('Could not access %s', filename, e);
+    }
 }
 function ensurePathStart(name) {
     if (name.indexOf('/') !== 0) {
@@ -62,8 +71,8 @@ function ensurePathStart(name) {
 function setEntry(serverRelativeUrl, hash) {
     entries[serverRelativeUrl] = hash;
 }
-WebApp.connectHandlers.use(function(req, res, next) {
-    if(Inject.appUrl(req.url)) {
+WebApp.connectHandlers.use(function (req, res, next) {
+    if (Inject.appUrl(req.url)) {
         Inject.obj('ngCacheKeys', entries);
     }
     next();
