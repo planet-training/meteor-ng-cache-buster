@@ -54,7 +54,9 @@ function manage(filename) {
         s.on('end', function () {
             var d = md5.digest('hex');
             console.log('CacheBuster managing: %s, hash: %s', filename, d);
-            setEntry(filename, d);
+            //TODO: why did I enforce the leadingslash anyways?! :)
+            var fileNameWithoutLeadingSlash = filename.indexOf('/') ? filename.substring(1) : filename;
+            setEntry(fileNameWithoutLeadingSlash, d);
         });
         s.on('error', function(err){
             console.error('error while processing %s', filename, err);
@@ -68,12 +70,16 @@ function ensurePathStart(name) {
         throw new Error('Managed file paths must start with /', name);
     }
 }
-function setEntry(serverRelativeUrl, hash) {
-    entries[serverRelativeUrl] = hash;
+function setEntry(key, hash) {
+    entries[key] = hash;
 }
 WebApp.connectHandlers.use(function (req, res, next) {
+
     if (Inject.appUrl(req.url)) {
-        Inject.obj('ngCacheKeys', entries);
+        Inject.rawModHtml('doSomething', function(html) {
+            return html.replace(/<\/body>/, '<script id="ngCacheKeys" type="application/ejson">'+JSON.stringify(entries)+'</script></body>');
+        });
+        //Inject.obj('ngCacheKeys', entries);
     }
     next();
 });

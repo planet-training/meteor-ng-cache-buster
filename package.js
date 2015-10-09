@@ -2,7 +2,7 @@ Npm.depends({
   'recursive-readdir' : '1.2.1'
 });
 Package.describe({
-  version: '0.4.2',
+  version: '0.5.0',
   name : 'planettraining:ng-cache-buster',
   summary : 'Calculates hashes of public files and appends it to angular\'s http request if available'
 });
