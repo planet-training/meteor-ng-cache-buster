@@ -55,7 +55,7 @@ function manage(filename) {
             var d = md5.digest('hex');
             console.log('CacheBuster managing: %s, hash: %s', filename, d);
             //TODO: why did I enforce the leadingslash anyways?! :)
-            var fileNameWithoutLeadingSlash = filename.indexOf('/') ? filename.substring(1) : filename;
+            var fileNameWithoutLeadingSlash = filename.indexOf('/')>-1 ? filename.substring(1) : filename;
             setEntry(fileNameWithoutLeadingSlash, d);
         });
         s.on('error', function(err){
